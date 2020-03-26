@@ -222,10 +222,7 @@ int main(int argc, char** argv) {
         if(i>=TABLESAMPLES){
             i=fmod(i,TABLESAMPLES);
         }
-          //std::cout<<(ampl)<<std::endl;
           buf[t]= (int)constrain(((ampl*table[i])/128.0f), 128, 0);
-          //std::cout<<" t "<<t<<" i "<<i<< " : "<<(int)buf[t]<<std::endl;
-          //std::cout<<buf[t]<<std::endl;
         }
         status = write(deviceID, buf, BUFFSIZE);
     }
