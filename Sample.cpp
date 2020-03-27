@@ -11,21 +11,20 @@
 #include <iostream>
 #include <cstring>
 #include <math.h>
-#include "Leap.h"
+#include "Leap.h" 
 //This for the synthe
 #include <sys/ioctl.h> //for ioctl()
 #include <math.h> //sin(), floor(), and pow()
 #include <stdio.h> //perror
 #include <fcntl.h> //open, O_WRONLY
 #include <linux/soundcard.h> //SOUND_PCM*
-#include <iostream>
-#include <unistd.h>
+#include <unistd.h> // Librairie employee dans la generation du son
 
 using namespace std;
  
-#define TYPE char
+#define TYPE char // car son de 8 bits
 #define LENGTH 0.1 //number of seconds per frequency
-#define RATE 40960//11000//44100 //sampling rate
+#define RATE 40960 //sampling rate
 #define SIZE sizeof(TYPE) //size of sample, in bytes
 #define CHANNELS 1 //number of audio channels
 #define PI 3.14159
@@ -33,7 +32,7 @@ using namespace std;
 #define BUFFSIZE (int) (NUM_FREQS*LENGTH*RATE*SIZE*CHANNELS) //bytes sent to audio device
 #define ARRAYSIZE (int) (NUM_FREQS*LENGTH*RATE*CHANNELS) //total number of samples
 #define SAMPLE_MAX (pow(2,SIZE*8 - 1) - 1) 
-#define TABLESAMPLES 40960 //Varibles para la tabla
+#define TABLESAMPLES 40960 // Taille du tableau de basse pour reechantillonage
 #define TABLESIZE (int) (TABLESAMPLES*SIZE)
 //Define des gains pour le control de pitch:
 #define WLX (float) ((1/600.0f)*3*(2000/5))
@@ -49,10 +48,11 @@ using namespace Leap;
 //Definir buffer pour la transmision des données et tableau pour échantilloner
 TYPE buf[ARRAYSIZE];
 TYPE table[TABLESIZE];
-// n est il prametre i
-int f=440;
+
+int f = 440;
 int ampl = 128;
 
+// SampleListener Heritage de la classe Listener de l'API LeapMotion
 class SampleListener : public Listener {
   public:
     virtual void onInit(const Controller&);
@@ -69,10 +69,12 @@ class SampleListener : public Listener {
   private:
 };
 
+// necessaires pour le calcul de la position
 const std::string fingerNames[] = {"Thumb", "Index", "Middle", "Ring", "Pinky"};
 const std::string boneNames[] = {"Metacarpal", "Proximal", "Middle", "Distal"};
 const std::string stateNames[] = {"STATE_INVALID", "STATE_START", "STATE_UPDATE", "STATE_END"};
 
+// Methodes actives au momment de detection de l'evenement
 void SampleListener::onInit(const Controller& controller) {
   std::cout << "Initialized" << std::endl;
 }
@@ -94,14 +96,16 @@ void SampleListener::onExit(const Controller& controller) {
   std::cout << "Exited" << std::endl;
 }
 
+
 //--------------------My fonction¡------------
+
 void SampleListener::onFrame(const Controller& controller) {
-   const Frame frame = controller.frame();
-   HandList hands = frame.hands();
+   const Frame frame = controller.frame(); // prends la lecture des capteurs
+   HandList hands = frame.hands(); // Extrait information des mains
+   // Execute une sousrutines pour chaque main
    for (HandList::const_iterator hl = hands.begin(); hl != hands.end(); ++hl) {
-     // Get the first hand
      const Hand hand = *hl;
-     if(hand.isLeft()){
+     if(hand.isLeft()){ // main gauche: calcule de frequence
         Leap::Vector left = hand.palmPosition();
         //------------------
         //X left[0]; -300 to 300
@@ -110,15 +114,16 @@ void SampleListener::onFrame(const Controller& controller) {
         //------------------
         f = abs((int)(WLX*abs((int)(-300+left[0]))+WLY*abs((int)(left[1]))+WLZ*abs((int)(left[2]))));
      }
-     if(hand.isRight()){
+     if(hand.isRight()){// main droite: calcule de amplitude
         Leap::Vector right = hand.palmPosition();
         //------------------
         //X right[0]; -300 to 300
         //Y right[1]; 0 to 500
         //Z right[2]; -300 to 300
         //------------------
-        
         int ampl_temp = WRY*abs((int)(right[1]));
+        
+        // saturation de l'amplitude: voir rapport
         if(ampl_temp>128){
          ampl=127;
         }else{
@@ -130,7 +135,8 @@ void SampleListener::onFrame(const Controller& controller) {
         }
      }
    }
-   std::cout<<"left Frequence: "<<f<<"right: Amplitude "<<ampl<<std::endl;
+   // Decomenter pour voir la frequence et la amplitude en temps reel
+   //std::cout<<"Frequence: "<<f<<" Amplitude "<<ampl<<std::endl;
 }
 //-------------Fonctions necesaires pour le fonctionement de la connection avec Leap Motion
 void SampleListener::onFocusGained(const Controller& controller) {
@@ -176,7 +182,7 @@ int main(int argc, char** argv) {
 
     int deviceID, arg, status, t, a, i;
 
-    //Generer le tableau de base
+    // Generer le tableau de basse pour sous-échantilloner avec les caracteristiques décris:
     int brightness = 128;
     int waveform = 128;
     float br = (1.0f + 3.0f*((float)(brightness)/(float)255.0))*((float)6.0/PI);
@@ -187,7 +193,6 @@ int main(int argc, char** argv) {
     
     for(t = 0; t< TABLESIZE; t++){
           table[t] = constrain(ampl * tanh((asin(sin(t*hp)) + wf)*br),dacMax,dacMin);
-          //std::cout<<(int)table[t]<<std::endl;
     }
     
     //Demarrer la transmition d'information pour la carte de son
@@ -207,7 +212,6 @@ int main(int argc, char** argv) {
       status = ioctl(deviceID, SNDCTL_DSP_SPEED, &arg);
       if (status == -1)
             perror("Unable to set sampling rate\n");
-      //a = SAMPLE_MAX;
     
     
   // Create a sample listener and controller
