@@ -3,9 +3,9 @@ ARCH := $(shell uname -m)
 
 ifeq ($(OS), Linux)
   ifeq ($(ARCH), x86_64)
-    LEAP_LIBRARY := ./LeapDeveloperKit_2.3.1+31549_linux/LeapSDK/lib/x64/libLeap.so -Wl,-rpath,../LeapDeveloperKit_2.3.1+31549_linux/LeapSDK/lib/x64
+    LEAP_LIBRARY := ./LeapDeveloperKit_2.3.1+31549_linux/LeapSDK/lib/x64/libLeap.so -Wl,-rpath,./LeapDeveloperKit_2.3.1+31549_linux/LeapSDK/lib/x64
   else
-    LEAP_LIBRARY := ./LeapDeveloperKit_2.3.1+31549_linux/LeapSDK/lib/x86/libLeap.so -Wl,-rpath,../LeapDeveloperKit_2.3.1+31549_linux/LeapSDK/lib/x86
+    LEAP_LIBRARY := ./LeapDeveloperKit_2.3.1+31549_linux/LeapSDK/lib/x86/libLeap.so -Wl,-rpath,./LeapDeveloperKit_2.3.1+31549_linux/LeapSDK/lib/x86
   endif
 else
   # OS X

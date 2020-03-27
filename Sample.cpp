@@ -175,7 +175,7 @@ char constrain(float number, int max, int min){
 int main(int argc, char** argv) {
 
     int deviceID, arg, status, t, a, i;
-      
+
     //Generer le tableau de base
     int brightness = 128;
     int waveform = 128;
