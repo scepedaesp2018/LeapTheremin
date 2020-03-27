@@ -35,9 +35,9 @@ using namespace std;
 #define TABLESAMPLES 40960 // Taille du tableau de basse pour reechantillonage
 #define TABLESIZE (int) (TABLESAMPLES*SIZE)
 //Define des gains pour le control de pitch:
-#define WLX (float) ((1/600.0f)*3*(2000/5))
-#define WLY (float) ((1/500.0f)*1*(2000/5))
-#define WLZ (float) ((1/300.0f)*1*(2000/5))
+#define WLX (float) ((1/600.0f)*4.5f*(5000/5))
+#define WLY (float) ((1/500.0f)*0.25f*(5000/5))
+#define WLZ (float) ((1/300.0f)*0.25f*(5000/5))
 //Define des gains pour le control d'amplitude:
 #define WRY (float) ((1/400.0f)*5*(128/5))
 
@@ -121,7 +121,7 @@ void SampleListener::onFrame(const Controller& controller) {
         //Y right[1]; 0 to 500
         //Z right[2]; -300 to 300
         //------------------
-        int ampl_temp = WRY*abs((int)(right[1]));
+        int ampl_temp = WRY*abs((int)(-30+right[1]));
         
         // saturation de l'amplitude: voir rapport
         if(ampl_temp>128){
@@ -136,7 +136,7 @@ void SampleListener::onFrame(const Controller& controller) {
      }
    }
    // Decomenter pour voir la frequence et la amplitude en temps reel
-   //std::cout<<"Frequence: "<<f<<" Amplitude "<<ampl<<std::endl;
+   // std::cout<<"Frequence: "<<f<<" Amplitude "<<ampl<<std::endl;
 }
 
 //-------------Fonctions necesaires pour le fonctionement de la connection avec Leap Motion
