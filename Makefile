@@ -12,11 +12,11 @@ else
   LEAP_LIBRARY := ./LeapDeveloperKit_2.3.1+31549_linux/LeapSDK/lib/libLeap.dylib
 endif
 
-Sample: Sample.cpp
-	$(CXX) -Wall -g -I./LeapDeveloperKit_2.3.1+31549_linux/LeapSDK/include Sample.cpp -o Sample $(LEAP_LIBRARY)
+LeapTheremin: LeapTheremin.cpp
+	$(CXX) -Wall -g -I./LeapDeveloperKit_2.3.1+31549_linux/LeapSDK/include LeapTheremin.cpp -o LeapTheremin $(LEAP_LIBRARY)
 ifeq ($(OS), Darwin)
-	install_name_tool -change @loader_path/libLeap.dylib ./LeapDeveloperKit_2.3.1+31549_linux/LeapSDK/lib/libLeap.dylib Sample
+	install_name_tool -change @loader_path/libLeap.dylib ./LeapDeveloperKit_2.3.1+31549_linux/LeapSDK/lib/libLeap.dylib LeapTheremin
 endif
 
 clean:
-	rm -rf Sample Sample.dSYMS
+	rm -rf LeapTheremin LeapTheremin.dSYMS
